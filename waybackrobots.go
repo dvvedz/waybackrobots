@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -13,24 +14,7 @@ import (
 
 type WaybackTimestamps [][]string
 
-func main() {
-	var domain string
-	var fromDate int
-	flag.StringVar(&domain, "domain", "", "which domain to find old robots for")
-	flag.IntVar(&fromDate, "fd", 2015, "choose date from when to get robots from format: 2015")
-	flag.Parse()
-
-	if domain == "" {
-		fmt.Fprint(os.Stderr, "supply a domain")
-		flag.PrintDefaults()
-		os.Exit(1)
-	}
-
-	if len(strings.Split(domain, ".")) < 1 {
-		fmt.Fprintf(os.Stderr, "ERROR not a valid domain: %s\n", domain)
-		os.Exit(1)
-	}
-
+func getRobots(domain string, fromDate int) {
 	var wt WaybackTimestamps
 
 	timestamps := fmt.Sprintf("https://web.archive.org/cdx/search/cdx?url=%s/robots.txt&output=json&fl=timestamp,original&filter=statuscode:200&collapse=digest&from=%d", domain, fromDate)
@@ -91,4 +75,35 @@ func main() {
 		}
 
 	}
+}
+
+func main() {
+
+	var domain string
+	var fromDate int
+
+	flag.StringVar(&domain, "domain", "", "which domain to find old robots for")
+	flag.IntVar(&fromDate, "fd", 2015, "choose date from when to get robots from format: 2015")
+
+	flag.Parse()
+
+	if domain != "" {
+		if len(strings.Split(domain, ".")) < 1 {
+			fmt.Fprintf(os.Stderr, "ERROR not a valid domain: %s\n", domain)
+			os.Exit(1)
+		}
+		getRobots(domain, fromDate)
+	} else {
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			domain := scanner.Text()
+			if len(strings.Split(domain, ".")) < 1 {
+				fmt.Fprintf(os.Stderr, "Skipping %s no a valid domain\n", domain)
+			} else {
+				getRobots(domain, fromDate)
+			}
+
+		}
+	}
+
 }
