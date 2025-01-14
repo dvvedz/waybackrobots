@@ -9,6 +9,8 @@ import (
 	"os"
 	"slices"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 type WaybackTimestamps [][]string
@@ -21,13 +23,17 @@ func main() {
 	flag.Parse()
 
 	if domain == "" {
-		fmt.Fprint(os.Stderr, "supply a domain")
+		color.Set(color.FgRed)
+		fmt.Fprintln(os.Stderr, "supply a domain, -domain")
+		color.Unset()
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
 	if len(strings.Split(domain, ".")) < 1 {
+		color.Set(color.FgRed)
 		fmt.Fprintf(os.Stderr, "ERROR not a valid domain: %s\n", domain)
+		color.Unset()
 		os.Exit(1)
 	}
 
@@ -36,7 +42,9 @@ func main() {
 	timestamps := fmt.Sprintf("https://web.archive.org/cdx/search/cdx?url=%s/robots.txt&output=json&fl=timestamp,original&filter=statuscode:200&collapse=digest&from=%d", domain, fromDate)
 	resp, err := http.Get(timestamps)
 	if err != nil {
+		color.Set(color.FgRed)
 		fmt.Fprintf(os.Stderr, "ERROR getting timestamps response: %v\n", err)
+		color.Unset()
 		os.Exit(1)
 	}
 
@@ -44,26 +52,39 @@ func main() {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
+		color.Set(color.FgRed)
 		fmt.Fprintf(os.Stderr, "ERROR reading response body: %v\n", err)
+		color.Unset()
 		os.Exit(1)
 	}
 
 	if resp.StatusCode != 200 {
+		color.Set(color.FgRed)
 		fmt.Fprintf(os.Stderr, "ERROR getting timestamps, status: %d, body: %v\n", resp.StatusCode, string(body))
+		color.Unset()
 		os.Exit(1)
 	}
 
 	if json.Unmarshal(body, &wt); err != nil {
+		color.Set(color.FgRed)
 		fmt.Fprintf(os.Stderr, "ERROR parsing json: %v\n", err)
+		color.Unset()
 		os.Exit(1)
 	}
+
+	color.Set(color.FgYellow)
+	fmt.Fprintf(os.Stderr, "[i] found %d old robots.txt files", len(wt))
+	color.Unset()
+
 	var uniquePaths []string
 	for _, e := range wt {
 		ts := e[0]
 		snapshotUrl := fmt.Sprintf("https://web.archive.org/web/%sid_/%s/robots.txt", ts, domain)
 		resp, err := http.Get(snapshotUrl)
 		if err != nil {
+			color.Set(color.FgRed)
 			fmt.Fprintf(os.Stderr, "ERROR getting robots resp: %v\n", err)
+			color.Unset()
 			os.Exit(1)
 		}
 
@@ -73,7 +94,9 @@ func main() {
 
 		body, err := io.ReadAll(resp.Body)
 		if err != nil {
+			color.Set(color.FgRed)
 			fmt.Fprintf(os.Stderr, "ERROR reading response body: %v\n", err)
+			color.Unset()
 			os.Exit(1)
 		}
 
