@@ -47,7 +47,7 @@ func getRobotsContent(domain, ts string) []string {
 		var paths []string
 		if strings.Contains(textContent, "Disallow:") {
 			for _, tc := range strings.Split(textContent, "\n") {
-				if strings.Contains(tc, "Disallow:") {
+				if strings.HasPrefix(tc, "Disallow:") {
 					path := strings.Split(tc, "Disallow:")
 					paths = append(paths, path[1])
 				}
