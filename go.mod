@@ -1,6 +1,6 @@
 module github.com/ogow/waybackrobots
 
-go 1.22.1
+go 1.23.4
 
 require github.com/fatih/color v1.18.0
 
