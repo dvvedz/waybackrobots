@@ -47,4 +47,6 @@ Usage of waybackrobots:
         which domain to find old robots for
   -fd int
         choose date from when to get robots from format: 2015 (default 2015)
+  -strat string
+        interval to get robots for, possible values: digest, day, month (default "digest") 
 ```
