@@ -1,4 +1,4 @@
-module github.com/dvvedz/waybackrobots
+module github.com/ogow/waybackrobots
 
 go 1.22.1
 
