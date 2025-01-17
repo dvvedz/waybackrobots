@@ -4,7 +4,7 @@ Collect old robots.txt files from waybackmachine and download the Disallow paths
 
 Install:
 ```shell
-$ go install github.com/dvvedz/waybackrobots@latest 
+$ go install github.com/ogow/waybackrobots@latest 
 ```
 
 Example:
